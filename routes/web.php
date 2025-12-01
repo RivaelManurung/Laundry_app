@@ -24,14 +24,16 @@ Route::middleware('auth')->group(function () {
 
     // Kasir & Transaksi
     Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('/transactions/processing', [TransactionController::class, 'processing'])->name('transactions.processing');
     Route::get('/transactions/ready', [TransactionController::class, 'ready'])->name('transactions.ready');
     Route::get('/transactions/history', [TransactionController::class, 'history'])->name('transactions.history');
+    Route::patch('/transactions/{transaction}/status', [TransactionController::class, 'updateStatus'])->name('transactions.update-status');
 
     // Master Data
-    Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
-    Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::resource('customers', CustomerController::class);
+    Route::resource('packages', PackageController::class);
+    Route::resource('inventory', InventoryController::class);
 
     // Keuangan & Laporan
     Route::get('/finance/cash-flow', [FinanceController::class, 'cashFlow'])->name('finance.cash-flow');
@@ -41,5 +43,6 @@ Route::middleware('auth')->group(function () {
 
     // Sistem
     Route::get('/settings/shop-profile', [SettingController::class, 'shopProfile'])->name('settings.shop-profile');
+    Route::put('/settings/shop-profile', [SettingController::class, 'updateShopProfile'])->name('settings.update-shop-profile');
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 });
