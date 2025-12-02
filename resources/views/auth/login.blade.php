@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Masuk ke Akun</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 
     <script>
@@ -18,11 +18,13 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#fff7ed',
-                            100: '#ffedd5',
-                            500: '#f97316',
-                            600: '#ea580c',
-                            700: '#c2410c',
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1', 
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
                         }
                     }
                 }
@@ -31,7 +33,7 @@
     </script>
 </head>
 
-<body class="bg-gray-50 text-gray-900 antialiased h-screen flex flex-col justify-center items-center">
+<body class="bg-gray-100 text-gray-900 antialiased h-screen flex flex-col justify-center items-center">
 
     <div class="w-full max-w-md px-6">
         <div class="flex justify-center mb-8">
@@ -42,7 +44,7 @@
             </div>
         </div>
 
-        <div class="bg-white py-8 px-10 shadow-xl rounded-2xl border border-gray-100">
+        <div class="bg-white py-8 px-10 shadow-lg rounded-xl border border-gray-100">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">
                 Selamat Datang Kembali
             </h2>
