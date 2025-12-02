@@ -10,6 +10,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,6 +31,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/transactions/history', [TransactionController::class, 'history'])->name('transactions.history');
     Route::patch('/transactions/{transaction}/status', [TransactionController::class, 'updateStatus'])->name('transactions.update-status');
 
+    // Pembayaran Midtrans
+    Route::get('/transactions/{transaction}/pay', [PaymentController::class, 'pay'])->name('transactions.pay');
+    Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+
     // Master Data
     Route::resource('customers', CustomerController::class);
     Route::resource('packages', PackageController::class);
@@ -37,7 +42,11 @@ Route::middleware('auth')->group(function () {
 
     // Keuangan & Laporan
     Route::get('/finance/cash-flow', [FinanceController::class, 'cashFlow'])->name('finance.cash-flow');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
+    Route::get('/reports/weekly', [ReportController::class, 'weekly'])->name('reports.weekly');
+    Route::get('/reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
+    Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('/reports/profit-loss', [ReportController::class, 'profitAndLoss'])->name('reports.profit-loss');
     Route::get('/reports/employee-performance', [ReportController::class, 'employeePerformance'])->name('reports.employee-performance');
 

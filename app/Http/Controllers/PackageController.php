@@ -7,9 +7,20 @@ use App\Models\Package;
 
 class PackageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $packages = Package::all();
+        $query = Package::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%")
+                  ->orWhere('unit', 'like', "%{$search}%");
+            });
+        }
+
+        $packages = $query->latest()->paginate(10)->withQueryString();
         return view('packages.index', compact('packages'));
     }
 

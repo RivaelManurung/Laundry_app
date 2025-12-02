@@ -17,7 +17,7 @@ class TransactionDetailFactory extends Factory
     public function definition(): array
     {
         $price = fake()->numberBetween(5000, 50000);
-        $quantity = fake()->numberBetween(1, 5);
+        $quantity = fake()->randomFloat(2, 1, 10);
         
         return [
             'transaction_id' => \App\Models\Transaction::factory(),

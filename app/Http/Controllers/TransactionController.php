@@ -55,31 +55,96 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::findOrFail($id);
         $transaction->update(['status' => $request->status]);
-        
+
         if ($request->status == 'ready') {
-             return redirect()->route('transactions.ready')->with('success', 'Status transaksi diperbarui menjadi Siap Ambil.');
+            return redirect()->route('transactions.ready')->with('success', 'Status transaksi diperbarui menjadi Siap Ambil.');
         } elseif ($request->status == 'done') {
-             return redirect()->route('transactions.history')->with('success', 'Transaksi selesai.');
+            return redirect()->route('transactions.history')->with('success', 'Transaksi selesai.');
         }
 
         return back()->with('success', 'Status transaksi diperbarui.');
     }
 
-    public function processing()
+    public function processing(Request $request)
     {
-        $transactions = Transaction::where('status', 'processing')->with('customer')->get();
+        // 1. Mulai Query
+        $query = Transaction::query();
+
+        // 2. Filter Status (Hanya ambil yang pending & processing)
+        $query->whereIn('status', ['pending', 'processing']);
+
+        // 3. Eager Load Relasi Customer (Biar ringan)
+        $query->with('customer');
+
+        // 4. Logika Search
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            // Gunakan where(function(...)) agar logika OR tidak merusak filter status
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_code', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // 5. Urutkan dari yang terbaru
+        $query->orderBy('created_at', 'desc');
+
+        // 6. Eksekusi Pagination (Jangan pakai get() lagi setelah ini)
+        $transactions = $query->paginate(10)->withQueryString();
+
         return view('transactions.processing', compact('transactions'));
     }
 
-    public function ready()
+    public function ready(Request $request)
     {
-        $transactions = Transaction::where('status', 'ready')->with('customer')->get();
+        $query = Transaction::query();
+        $query->where('status', 'ready');
+        $query->with('customer');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_code', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $query->orderBy('updated_at', 'desc');
+        $transactions = $query->paginate(10)->withQueryString();
+
         return view('transactions.ready', compact('transactions'));
     }
 
-    public function history()
+    public function history(Request $request)
     {
-        $transactions = Transaction::with('customer')->latest()->get();
+        $query = Transaction::query();
+        $query->with('customer');
+
+        // History biasanya menampilkan yang sudah selesai atau dibatalkan
+        // Tapi jika user ingin "Semua Riwayat" termasuk yang pending, kita bisa sesuaikan.
+        // Default history biasanya 'done' atau 'cancelled'. 
+        // Namun kode sebelumnya `Transaction::with('customer')->latest()->get()` mengambil SEMUA status.
+        // Jadi saya akan tetap mengambil semua status untuk history, atau mungkin filter status 'done'/'cancelled' jika itu maksudnya.
+        // Mengikuti kode lama: ambil semua.
+        
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_code', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $query->orderBy('created_at', 'desc');
+        $transactions = $query->paginate(10)->withQueryString();
+
         return view('transactions.history', compact('transactions'));
     }
 }

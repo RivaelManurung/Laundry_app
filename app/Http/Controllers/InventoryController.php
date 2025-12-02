@@ -7,9 +7,19 @@ use App\Models\Inventory;
 
 class InventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $inventories = Inventory::all();
+        $query = Inventory::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('item_name', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        $inventories = $query->latest()->paginate(10)->withQueryString();
         return view('inventory.index', compact('inventories'));
     }
 
